@@ -1,0 +1,21 @@
+{
+ "note": "Ví dụ kế hoạch đăng. Chạy thử: node fb-schedule.mjs ke-hoach.example.json (thêm --that mới đăng thật).",
+ "posts": [
+  {
+   "platform": "facebook",
+   "kind": "reel",
+   "file": "../cartoon-shorts/exports/tap_1_short.mp4",
+   "description": "Lời dẫn của bạn #hashtag",
+   "at": "2027-01-05T20:00:00+07:00"
+  },
+  {
+   "platform": "facebook",
+   "kind": "video",
+   "file": "../cartoon-shorts/exports/tap_1_ban_dai.mp4",
+   "title": "Tiêu đề bản dài",
+   "description": "mo-ta.txt",
+   "thumb": "anh-bia.jpg",
+   "at": "2027-01-07T20:00:00+07:00"
+  }
+ ]
+}

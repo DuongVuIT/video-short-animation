@@ -1,0 +1,15 @@
+L01   0.07-  4.28 (latest  4.28) tempo x0.94, x0.87, x1.11 | anchors knocked: +0.00s, just: +0.00s
+L02   4.45-  9.04 (latest  9.38) tempo x1.14, x1.00 | anchors pride: +0.00s
+L03   9.50- 14.75 (latest 14.75) tempo x0.85, x1.03 | anchors every: +0.00s
+L04  14.87- 17.75 (latest 17.75) tempo x0.96, x1.02 | anchors bouncing: +0.00s
+L05  17.87- 21.09 (latest 21.38) tempo x1.45, x0.85, x1.00 | anchors these: +0.12s, think: +0.00s | piece 0 needs x1.58, capped at x1.45
+L06  21.50- 27.38 (latest 27.38) tempo x1.04, x1.09 | anchors whole: +0.00s
+L07  27.50- 32.81 (latest 32.85) tempo x0.91, x0.91, x1.00 | anchors chains: +0.00s, nobody: +0.00s
+L08  33.00- 37.74 (latest 37.75) tempo x0.85, x1.07, x1.00 | anchors snaps: +0.00s, drops: +0.00s
+L09  37.87- 40.35 (latest 40.35) tempo x1.06
+L10  40.50- 43.24 (latest 43.38) tempo x1.00
+L11  43.50- 46.74 (latest 47.00) tempo x1.00
+L12  47.10- 53.98 (latest 53.98) tempo x1.09
+L13  54.07- 57.64 (latest 57.78) tempo x1.00, x1.00 | anchors pushing: +0.00s
+L14  57.90- 61.71 (latest 62.00) tempo x1.05, x1.00 | anchors in: +0.00s
+L15  62.15- 67.08 (latest 67.40) tempo x0.85, x1.07, x1.00 | anchors best: +0.00s, like: +0.00s

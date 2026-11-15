@@ -1,0 +1,22 @@
+# khoá bí mật: không bao giờ commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# thư viện, file tạm, thành phẩm
+node_modules/
+.venv/
+__pycache__/
+out/
+exports/
+backup/
+.DS_Store
+.progress.lock
+*.lock.tmp
+*.json.tmp
+# âm thanh và video sinh ra được từ script
+*.wav
+*.mp3
+*.mp4
+*.mov

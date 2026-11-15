@@ -1,0 +1,10 @@
+node_modules/
+.venv/
+out/
+exports/
+backup/
+__pycache__/
+.DS_Store
+.progress.lock
+*.json.tmp
+.env

@@ -1,0 +1,92 @@
+// contact sheets for the engine's acting options. Build + shoot: ./shoot.sh <sheet> [<sheet> ...]
+import * as T from "../../../src/engine/toon";
+type Cell = { label: string; w?: number; h?: number; draw: (p: T.Pen, g: CanvasRenderingContext2D) => void; body?: boolean };
+const q = new URLSearchParams(location.hash.slice(1));
+const name = q.get("sheet") ?? "gestA_ti", K = Number(q.get("k") ?? 0.4), cols = Number(q.get("cols") ?? 7);
+const WHO: Record<string, T.Outfit> = { ti: T.TI, ba: T.BA, vil: T.VILLAGER(1), vil0: T.VILLAGER(0), tiold: T.TI_OLD, thay: T.THAY, na: T.NA, ong: T.ONG_GHOST, bawet: T.BA_WET,
+  cu: T.CU_LIVE, khanh: T.KHANH, daosi: T.DAOSI, ban: T.BAN, officer: T.OFFICER, kid: T.KID, parent: T.PARENT, hau: T.HAU, ngo: T.NGO, baghost: T.BA_GHOST, kid2: T.KIDS[2], towns: T.townsfolk(1), towns0: T.townsfolk(0), rifle: T.RIFLEMAN };
+const body = (o: T.Outfit, fo: T.FrontOpts, label: string): Cell => ({ label, body: true, draw: (p) => T.bodyFront(p, o, { mode: "stand", blink: 0, seed: 1, ...fo }) });
+const side = (o: T.Outfit, so: T.SideOpts, label: string): Cell => ({ label, body: true, draw: (p) => T.bodySide(p, o, { seed: 1, ...so }) });
+const GA: T.Gesture[] = ["point", "reach", "up", "hips", "ears", "pray", "pat"], GB: T.Gesture[] = ["hold", "wipe", "scratch", "chin", "hug", "cupcall"];
+const cells: Cell[] = [];
+const m = name.match(/^gest([AB])_(\w+?)(?:_(sit|stroll|back|sitback))?$/);
+if (m) {
+  const o = WHO[m[2]], mode = m[3] === "sit" || m[3] === "sitback" ? "sit" : m[3] === "stroll" ? "stroll" : "stand", back = m[3] === "back" || m[3] === "sitback";
+  for (const k of [0.25, 0.5, 0.75, 1]) for (const gname of m[1] === "A" ? GA : GB)
+    cells.push(body(o, { mode, back, phase: 0.2, gesture: [gname, k], expr: gname === "up" ? "shock" : gname === "hips" ? "stern" : gname === "wipe" ? "sad" : gname === "cupcall" ? "call" : "neutral" }, `${gname} ${k}`));
+} else if (name.startsWith("talk_")) {
+  const o = WHO[name.slice(5)];
+  for (const t of [0, 0.25, 0.5, 1]) for (const e of ["neutral", "smile", "stern", "sad", "worried", "scared", "tired", "call"] as T.Expr[]) cells.push(body(o, { expr: e, talk: t }, `${e} ${t}`));
+} else if (name.startsWith("talk2_")) {
+  const o = WHO[name.slice(6)];
+  for (const t of [0, 0.5, 1]) for (const e of ["grin", "laugh", "nervous", "relief", "smile_closed", "lick", "fierce", "shock"] as T.Expr[]) cells.push(body(o, { expr: e, talk: t }, `${e} ${t}`));
+} else if (name === "back") {
+  for (const w of ["ti", "ba", "vil", "vil0", "tiold", "thay", "na", "cu", "khanh", "daosi", "ban", "officer", "kid", "parent", "hau", "ngo", "baghost", "kid2", "towns", "towns0", "ong"]) {
+    cells.push(body(WHO[w], { back: true }, `${w} back`));
+  }
+} else if (name === "backsit") {
+  for (const w of ["ti", "ba", "vil", "tiold", "na", "cu", "thay"]) { cells.push(body(WHO[w], { back: true, mode: "sit" }, `${w} back sit`)); cells.push(body(WHO[w], { mode: "sit" }, `${w} sit`)); }
+} else if (name === "backmix") {
+  cells.push(body(T.TI, { back: true, mode: "sit", prop: "rod" }, "ti back sit rod"), body(T.TI, { back: true, mode: "sit", gesture: ["hug", 1] }, "ti back sit hug"),
+    body(T.TI, { back: true, mode: "stroll", phase: 0.2 }, "ti back stroll"), body(T.BA, { back: true, gesture: ["point", 1] }, "ba back point"),
+    body(T.TI_OLD, { back: true, prop: "cane" }, "tiold back cane"), body(T.BA, { back: true, gesture: ["hips", 1], tilt: 6, headTilt: -8 }, "ba back hips tilt"),
+    body(T.VILLAGER(1), { back: true, gesture: ["scratch", 1] }, "vil back scratch"), body(T.NA, { back: true, gesture: ["up", 1] }, "na back up"),
+    body(T.VILLAGER(0), { back: true, gesture: ["ears", 1] }, "vil0 back ears"), body(T.THAY, { back: true, gesture: ["pray", 1] }, "thay back pray"),
+    body(T.TI, { back: true, gesture: ["wipe", 1] }, "ti back wipe"), body(T.BA, { back: true, mode: "sit", gesture: ["hold", 1] }, "ba back sit hold"));
+} else if (name === "outfits") {
+  for (const w of ["tiold", "thay", "na", "ong", "bawet"]) {
+    cells.push(body(WHO[w], { expr: w === "thay" ? "stern" : w === "na" ? "smile" : w === "ong" ? "ghost" : "neutral" }, w));
+    cells.push(body(WHO[w], { mode: "sit", expr: "sad", facing: 1 }, w + " sit f1"));
+    cells.push(side(WHO[w], { mode: "stand" }, w + " side"));
+    cells.push(side(WHO[w], { mode: "march", phase: 0.1, stride: 0.6 }, w + " walk"));
+  }
+} else if (name === "props") {
+  for (const w of ["ti", "tiold", "ba", "vil"]) {
+    cells.push(body(WHO[w], { prop: "rod" }, w + " rod"), body(WHO[w], { prop: "rod", mode: "sit" }, w + " rod sit"), body(WHO[w], { prop: "bowl" }, w + " bowl"),
+      body(WHO[w], { prop: "bowl", mode: "sit" }, w + " bowl sit"), body(WHO[w], { prop: "bowl", gesture: ["hold", 0.5] }, w + " bowl hold.5"), body(WHO[w], { prop: "cane" }, w + " cane"), body(WHO[w], { prop: "cane", mode: "sit" }, w + " cane sit"));
+  }
+} else if (name === "props2") {
+  for (const ph of [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]) cells.push(side(T.TI_OLD, { mode: "march", phase: ph, stride: 0.42, shuffle: true, prop: "cane" }, "shuffle cane " + ph));
+  for (const ph of [0, 0.25, 0.5, 0.75]) cells.push(side(T.BA, { mode: "march", phase: ph, stride: 0.7, prop: "cane" }, "ba cane walk " + ph));
+  cells.push(side(T.TI_OLD, { mode: "stand", prop: "cane" }, "stand cane"), side(T.TI_OLD, { mode: "march", phase: 0.2, stride: 0.42, shuffle: true }, "shuffle no cane"),
+    body(T.TI, { prop: "rod", gesture: ["point", 1] }, "rod + point"), body(T.TI_OLD, { prop: "cane", gesture: ["pat", 1, -1] }, "cane + pat -1"),
+    body(T.BA, { prop: "lantern", gesture: ["hips", 1] }, "lantern + hips"), body(T.THAY, { prop: "talisman", gesture: ["up", 1] }, "talisman + up"),
+    side(T.TI_OLD, { mode: "stand", talk: 0.8, expr: "sad" }, "side talk"), side(T.NA, { mode: "march", phase: 0.1, stride: 0.5, talk: 0.6, expr: "smile" }, "na side talk"));
+} else if (name === "misc") {
+  for (const b of [-1, 0, 1]) cells.push(body(T.BA, { breath: b }, "breath " + b));
+  for (const b of [-1, 1]) cells.push(body(T.TI, { breath: b, mode: "sit" }, "ti sit breath " + b));
+  for (const gz of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1], [-1, -1]] as [number, number][]) cells.push(body(T.TI, { gaze: gz, expr: "smile" }, "gaze dot " + gz));
+  for (const gz of [[0, -1], [0, 1], [1, 1]] as [number, number][]) cells.push(body(T.BA, { gaze: gz, expr: "neutral" }, "gaze lid " + gz));
+  for (const gz of [[0, -1], [0, 1]] as [number, number][]) cells.push(body(T.TI, { gaze: gz, expr: "shock" }, "gaze shock " + gz));
+  cells.push(body(T.NA, { gesture: ["pat", 1] }, "na"), body(T.BA, { gesture: ["pat", 1, -1], facing: -1, expr: "smile" }, "ba pat -1"));
+  cells.push(body(T.KHANH, { gesture: ["pray", 1], talk: 0.6 }, "khanh pray talk"), body(T.DAOSI, { gesture: ["point", 1] }, "daosi point"), body(T.THAY, { gesture: ["up", 0.6] }, "thay up .6"),
+    body(T.THAY, { gesture: ["hold", 0.2] }, "thay hold .2"), body(T.OFFICER, { gesture: ["hips", 1] }, "officer hips"), body(T.RIFLEMAN, { gesture: ["point", 1], mode: "stand" }, "rifle point"));
+} else if (name === "fx") {
+  const fx = (label: string, w: number, h: number, d: (p: T.Pen) => void): Cell => ({ label, w, h, draw: d });
+  cells.push(fx("effigy dry", 400, 700, (p) => T.fxEffigy(p, false)), fx("effigy wet", 400, 700, (p) => T.fxEffigy(p, true)), fx("leafboat", 256, 256, T.fxLeafBoat), fx("rod", 600, 120, T.fxRod),
+    fx("bowl", 256, 256, T.fxBowl), fx("moon", 256, 256, T.fxMoon), fx("torch 0", 128, 256, (p) => T.fxTorch(p, 0)), fx("torch .37", 128, 256, (p) => T.fxTorch(p, 0.37)), fx("torch .9", 128, 256, (p) => T.fxTorch(p, 0.9)));
+} else if (name.startsWith("list")) { // list=who:gesture:k:mode:back(0/1):expr;...
+  for (const it of (q.get("list") ?? "").split(";")) { const [w, gn, k, mode, bk, ex] = it.split(":");
+    cells.push(body(WHO[w], { mode: (mode || "stand") as "stand", back: bk === "1", expr: (ex || "neutral") as T.Expr, gesture: gn ? [gn as T.Gesture, Number(k)] : undefined }, it)); }
+} else if (name.startsWith("one_")) { // one_<who>_<gesture>_<k>_<mode>
+  const [, w, gname, k, mode] = name.split("_");
+  cells.push(body(WHO[w], { mode: (mode ?? "stand") as "stand", gesture: [gname as T.Gesture, Number(k)] }, name));
+}
+const ZC = q.get("cy") ? Number(q.get("cy")) : null, ZH = Number(q.get("ch") ?? 300);
+const CW = (ZC !== null ? 300 : 600) * K, CH = (ZC !== null ? ZH : 1000) * K, fxSheet = name === "fx", n = cells.length, rows = Math.ceil(n / cols);
+const cv = document.createElement("canvas");
+cv.width = fxSheet ? 1700 : cols * CW; cv.height = fxSheet ? 920 : rows * CH;
+document.body.appendChild(cv);
+const g = cv.getContext("2d")!;
+g.fillStyle = name === "fx" ? "#4f6f86" : "#a9bcc6"; g.fillRect(0, 0, cv.width, cv.height);
+let fxX = 10, fxY = 30;
+cells.forEach((c, i) => {
+  g.save();
+  if (c.body) { const x = (i % cols) * CW, y = Math.floor(i / cols) * CH; g.strokeStyle = "rgba(0,0,0,0.15)"; g.lineWidth = 1; g.strokeRect(x, y, CW, CH); g.beginPath(); g.rect(x, y, CW, CH); g.clip(); g.translate(x, y); g.scale(K, K); if (ZC !== null) g.translate(-150, -(ZC - ZH / 2)); }
+  else { if (fxX + c.w! > 1690) { fxX = 850; fxY += 300; } g.strokeStyle = "rgba(255,255,255,0.3)"; g.strokeRect(fxX, fxY, c.w!, c.h!); g.beginPath(); g.rect(fxX, fxY, c.w!, c.h!); g.clip(); g.translate(fxX, fxY); }
+  c.draw(new T.Pen(g), g);
+  g.restore();
+  g.fillStyle = "#111"; g.font = "13px sans-serif";
+  if (c.body) g.fillText(c.label, (i % cols) * CW + 5, Math.floor(i / cols) * CH + 15); else { g.fillStyle = "#fff"; g.fillText(c.label, fxX, fxY - 8); fxX += c.w! + 14; }
+});
+document.title = "done";
